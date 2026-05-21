@@ -18,7 +18,15 @@ void resetCur(int64_t&);
 void loadDirectories(std::vector<std::filesystem::path>&, const std::filesystem::path&);
 void clearBuffer(std::string&);
 void renderAllSh(std::string&);
+void execScanCodes(int);
 //void clear();
+
+enum SCANS {
+	ENTER,
+	ESC,
+	UP,
+	DOWN
+};
 
 
 int rows{12};
@@ -39,13 +47,15 @@ void start() {
 	resetCur(cur);
 	loadDirectories(list, path);
 
-	int temp{};
+	int temb{};
 	while (1) {
 		clearBuffer(buffer);
 		//system("cls");
 		//clear();
 
 		// ===============================
+
+		execScanCodes(scan);
 		if (scan == 13) {		// ENTER 10
 			if (cur == -1) {
 
@@ -87,16 +97,19 @@ void start() {
 
 		if (path == path.root_path()) {
 			if (cur == -1) cur++;
-			//temp--;
 			//cur = 0;
 		} else {
+
 			if (cur == -1) buffer += CURSOR "<--\n";
 
 			else buffer += "<--\n";
 
 		}
 		// ============= All to buffer =============
-		for (size_t i{}; i < list.size(); i++) {
+		//for (size_t i{}; i < list.size(); i++) {
+		//for (int i{temb}; i < rows+temb && i < (int)list.size(); i++) {
+		for (int i{temb}; i < rows+temb; i++) {
+			if (i >= (int)list.size()) break;
 			if (cur == i) {
 				if (std::filesystem::is_directory(list.at(i)))
 					buffer += YELLOW_BG BLACK CURSOR;
@@ -107,7 +120,6 @@ void start() {
 				if (std::filesystem::is_directory(list.at(i)))
 					buffer += (YELLOW);
 			}
-
 
 
 			buffer += (list.at(i).filename().string() + "\x1b[0m\n");
@@ -138,6 +150,13 @@ void clearBuffer(std::string& buf) {
 void renderAllSh(std::string& buf) {
 	printf("%s%s%s", CLEAR, buffer.c_str(), "\x1B[?25l");
 };
+
+SCANS execScanCodes(int scan) {
+	if (scan == 13) return ENTER;	// ENTER 10
+		
+	
+
+}
 
 
 //void clear() {
